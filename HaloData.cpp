@@ -16,8 +16,8 @@ HaloCacheFileHeaderDemo HaloCacheFileHeader::asDemoHeader() {
     
     demoHeader.fileCRC32 = this->fileCRC32;
     demoHeader.fileSize = this->fileSize;
-    memcpy(demoHeader.foot,"tofG",4);
-    memcpy(demoHeader.head,"dehE",4);
+    demoHeader.head = HEADER_EHED;
+    demoHeader.foot = HEADER_GFOT;
     memcpy(demoHeader.mapBuild,this->mapBuild,32);
     memcpy(demoHeader.mapName,this->mapName,32);
     demoHeader.mapGame = this->mapGame;
@@ -32,8 +32,8 @@ HaloCacheFileHeader HaloCacheFileHeaderDemo::asStandardHeader() {
     
     header.fileCRC32 = this->fileCRC32;
     header.fileSize = this->fileSize;
-    memcpy(header.foot,"toof",4);
-    memcpy(header.head,"daeh",4);
+    header.head = HEADER_HEAD;
+    header.foot = HEADER_FOOT;
     memcpy(header.mapBuild,this->mapBuild,32);
     memcpy(header.mapName,this->mapName,32);
     header.mapGame = this->mapGame;

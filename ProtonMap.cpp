@@ -13,9 +13,9 @@ ProtonMap::ProtonMap(const void *cache_file) {
     const char *cache_file_c = (const char *)(cache_file);
     HaloCacheFileHeader header = *(HaloCacheFileHeader *)(cache_file_c);
     this->meta_address = 0x40440000;
-    if(memcmp(header.head,"daeh",4) != 0) {
+    if(header.head != HEADER_HEAD) {
         HaloCacheFileHeaderDemo demoHeader = *(HaloCacheFileHeaderDemo *)(cache_file_c);
-        if(memcmp(demoHeader.head,"dehE",4) == 0) {
+        if(demoHeader.head == HEADER_EHED) {
             this->meta_address = 0x4BF10000;
             header = demoHeader.asStandardHeader();
         }
