@@ -13,10 +13,10 @@
 
 #define NULLED_TAG_ID 0xFFFF
 
-#define HEADER_HEAD 1751474532 // *(uint32_t *)"daeh"
-#define HEADER_FOOT 1718579060 // *(uint32_t *)"toof"
-#define HEADER_EHED 1164469604 // *(uint32_t *)"dehE"
-#define HEADER_GFOT 1197895540 // *(uint32_t *)"tofG"
+#define HEADER_HEAD 1751474532 // head
+#define HEADER_FOOT 1718579060 // foot
+#define HEADER_EHED 1164469604 // Ehed
+#define HEADER_GFOT 1197895540 // Gfot
 
 typedef enum HaloMapGame : uint32_t {
     HALO_MAP_GAME_PC = 7,
@@ -29,7 +29,7 @@ typedef enum HaloMapGame : uint32_t {
 typedef enum HaloMapType : uint16_t {
     HALO_MAP_TYPE_SINGLEPLAYER = 0,
     HALO_MAP_TYPE_MULTIPLAYER = 1,
-    HALO_MAP_TYPE_USER_INTERFACE = 2, 
+    HALO_MAP_TYPE_USER_INTERFACE = 2,
     HALO_MAP_TYPE_CUSTOM_PROTON_TAG_ARRAY = 0xFF01
 } HaloMapType;
 
@@ -58,7 +58,7 @@ struct HaloCacheFileHeaderDemo {
     char padding1[2] = {};              //0x0
     HaloMapType mapType;                //0x2
     char padding2[0x2BC] = {};          //0x4 We're going to be seeing a lot of these in the demo header.
-    uint32_t head = HEADER_EHED;        //0x2C0
+    uint32_t head = HEADER_EHED;        //0x2C0 Ehed
     uint32_t tagDataSize;               //0x2C4
     char mapBuild[32] = {};             //0x2C8
     char padding3[0x2A0];               //0x2E8
@@ -69,7 +69,7 @@ struct HaloCacheFileHeaderDemo {
     char padding5[0x34] = {};           //0x5B4
     uint32_t fileSize;                  //0x5E8
     uint32_t tagDataOffset;             //0x5EC
-    uint32_t foot = HEADER_GFOT;        //0x5F0 Gfot backwards
+    uint32_t foot = HEADER_GFOT;        //0x5F0 Gfot
     char padding6[0x20C]={};            //0x5F4
     
     struct HaloCacheFileHeader asStandardHeader();
