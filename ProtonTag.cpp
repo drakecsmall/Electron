@@ -193,7 +193,7 @@ void ProtonTag::ScanDependencies(ProtonTagArray *parent_tag_array) {
         for(uint32_t i=0;i < this->DataLength() - sizeof(HaloTagDependency) + iterate;i += iterate) {
             const HaloTagDependency *tag_dependency = (const HaloTagDependency *)(data + i);
             uint16_t index = tag_dependency->tag_id.tag_index;
-            if(index < array_size && memcmp(tag_dependency->tag_class, parent_tag_array->tags.at(index).get()->tag_classes, 4) == 0 && tag_dependency->reserved_data == 0) {
+            if(index < array_size && memcmp(tag_dependency->tag_class, parent_tag_array->tags[index].get()->tag_classes, 4) == 0 && tag_dependency->reserved_data == 0) {
                 this->dependencies.emplace_back(new ProtonTagDependency(i, *tag_dependency));
             }
         }
@@ -232,10 +232,8 @@ static inline void IncreaseReflexiveIfPossible(uint32_t ref_offset, uint32_t off
 void ProtonTag::OffsetData(uint32_t offset, int32_t size) {
     if(this->resource_index != NO_RESOURCE_INDEX || this->Data() == NULL || this->DataLength() < sizeof(HaloTagReflexive)) return;
     if(size == 0) return;
-    //if(memcmp(this->tag_classes, "rncs", 4) == 0) {
-#warning TODO: Scenario tag's reflexives are not mapped out yet. Due to the complexity of this tag, using the brute-force algorithm might break the tag on some maps.
-    //}
-    /* else */ if(memcmp(this->tag_classes,"psbs",4) == 0) {
+    /* TODO: MAP SCENARIO TAGS */
+    if(memcmp(this->tag_classes,"psbs",4) == 0) {
         // SBSP tag must use mapped out reflexives, or else holes might occur in the map.
         std::cout << "ProtonTag::AlignDataToAddress WARNING: This function does not support sbsp tags yet.\n";
         return;
@@ -276,8 +274,8 @@ void ProtonTag::AppendData(uint32_t offset, uint32_t size) {
     this->OffsetData(offset, size);
     
     for(std::vector<int>::size_type i=0;i<this->dependencies.size();i++) {
-        if(this->dependencies.at(i).get()->offset >= offset) {
-            this->dependencies.at(i).get()->offset += size;
+        if(this->dependencies[i].get()->offset >= offset) {
+            this->dependencies[i].get()->offset += size;
         }
     }
     
@@ -300,14 +298,14 @@ void ProtonTag::InsertData(uint32_t offset, const char *data, uint32_t size) {
 void ProtonTag::DeleteData(uint32_t offset, uint32_t size) {
     
     for(std::vector<int>::size_type i = this->dependencies.size() - 1;i < this->dependencies.size(); i--) {
-        if(this->dependencies.at(i).get()->offset >= offset && this->dependencies.at(i).get()->offset < offset + size) {
+        if(this->dependencies[i].get()->offset >= offset && this->dependencies[i].get()->offset < offset + size) {
             this->dependencies.erase(this->dependencies.begin() + i);
         }
     }
     
     for(std::vector<int>::size_type i=0;i<this->dependencies.size();i++) {
-        if(this->dependencies.at(i).get()->offset >= offset) {
-            this->dependencies.at(i).get()->offset -= size;
+        if(this->dependencies[i].get()->offset >= offset) {
+            this->dependencies[i].get()->offset -= size;
         }
     }
     
@@ -363,7 +361,7 @@ ProtonTag& ProtonTag:: operator=(const ProtonTag& tag) {
     this->tag_magic = tag.tag_magic;
     this->dependencies.clear();
     for(std::vector<int>::size_type i=0;i<tag.dependencies.size();i++) {
-        const ProtonTagDependency *old_dependency = tag.dependencies.at(i).get();
+        const ProtonTagDependency *old_dependency = tag.dependencies[i].get();
         std::unique_ptr<ProtonTagDependency> newDependency(new ProtonTagDependency);
         *newDependency.get() = *old_dependency;
         this->dependencies.push_back(std::move(newDependency));

@@ -178,8 +178,8 @@ ProtonMap::ProtonMap(const void *cache_file) {
         }
     }
     
-    for(uint32_t t=0;t<index->tagCount;t++) {
-        this->tags.at(t).get()->ScanDependencies(this);
+    for(auto it = this->tags.begin(); it != this->tags.end(); ++it) {
+        it->get()->ScanDependencies(this);
     }
 }
 
@@ -215,14 +215,14 @@ ProtonCacheFile ProtonMap::ToCacheFile() const {
     
     // Count resource data length and write info for SBSP data.
     for (std::vector<int>::size_type i=0;i<map.tags.size();i++) {
-        ProtonTag *tag = map.tags.at(i).get();
+        ProtonTag *tag = map.tags[i].get();
         if(tag->resource_index == NO_RESOURCE_INDEX && memcmp(tag->tag_classes,"psbs",4) != 0) {
             tagDataLength += tag->DataLength();
         }
         if(memcmp(tag->tag_classes, "psbs", 4) == 0) {
             if(map.principal_tag == NULLED_TAG_ID) continue; // No scenario tag. Cannot save sbsp tag.
-            const char *scenarioData = map.tags.at(map.principal_tag).get()->Data();
-            uint32_t scenarioMagic = map.tags.at(map.principal_tag).get()->tag_magic;
+            const char *scenarioData = map.tags[map.principal_tag].get()->Data();
+            uint32_t scenarioMagic = map.tags[map.principal_tag].get()->tag_magic;
             const HaloTagReflexive *sbsps = (HaloTagReflexive *)(scenarioData + 0x5A4);
             const HaloScnrBSPIndex *sbspIndices = (HaloScnrBSPIndex *)(scenarioData + sbsps->address - scenarioMagic);
             for(uint32_t b=0;b<sbsps->count;b++) {
@@ -284,7 +284,7 @@ ProtonCacheFile ProtonMap::ToCacheFile() const {
     uint32_t tagNameOffset = 0;
     //Tag name copying
     for(uint32_t i=0;i<metaHeader.tagCount; i++) {
-        ProtonTag *tag = map.tags.at(i).get();
+        ProtonTag *tag = map.tags[i].get();
         memcpy(tagArray[i].tag_class_a, tag->tag_classes + 0, 4);
         memcpy(tagArray[i].tag_class_b, tag->tag_classes + 4, 4);
         memcpy(tagArray[i].tag_class_c, tag->tag_classes + 8, 4);
@@ -297,10 +297,10 @@ ProtonCacheFile ProtonMap::ToCacheFile() const {
     
     // Tag dependency resolving
     for(uint32_t i=0;i<metaHeader.tagCount; i++) {
-        ProtonTag *tag = map.tags.at(i).get();
+        ProtonTag *tag = map.tags[i].get();
         if(tag->resource_index != NO_RESOURCE_INDEX) continue;
         for(std::vector<int>::size_type d=0; d<tag->dependencies.size(); d++) {
-            ProtonTagDependency *dependency = tag->dependencies.at(d).get();
+            ProtonTagDependency *dependency = tag->dependencies[d].get();
             if(dependency->type == PROTON_TAG_DEPENDENCY_TAGID) {
                 HaloTagID *tagID = (HaloTagID *)(tag->Data() + dependency->offset);
                 *tagID = HaloTagID(dependency->tag);
@@ -333,7 +333,7 @@ ProtonCacheFile ProtonMap::ToCacheFile() const {
     uint32_t modelCount = 0;
     
     for(uint32_t i=0;i<metaHeader.tagCount;i++) {
-        ProtonTag *tag = map.tags.at(i).get();
+        ProtonTag *tag = map.tags[i].get();
         if(tag->resource_index != NO_RESOURCE_INDEX) continue;
         if(memcmp(tag->tag_classes,"2dom",4) == 0) {
             char *tagData = tag->Data();
@@ -390,10 +390,10 @@ ProtonCacheFile ProtonMap::ToCacheFile() const {
     if(map.principal_tag != NULLED_TAG_ID) {
         uint32_t sbspOffset = 0;
         for(uint32_t i=0;i<metaHeader.tagCount;i++) {
-            ProtonTag *tag = map.tags.at(i).get();
+            ProtonTag *tag = map.tags[i].get();
             if(memcmp(tag->tag_classes,"psbs",4) == 0) {
-                char *scenarioData = map.tags.at(map.principal_tag).get()->Data();
-                uint32_t scenarioMagic = map.tags.at(map.principal_tag).get()->tag_magic;
+                char *scenarioData = map.tags[map.principal_tag].get()->Data();
+                uint32_t scenarioMagic = map.tags[map.principal_tag].get()->tag_magic;
                 HaloTagReflexive *sbsps = (HaloTagReflexive *)(scenarioData + 0x5A4);
                 HaloScnrBSPIndex *sbspIndices = (HaloScnrBSPIndex *)(scenarioData + sbsps->address - scenarioMagic);
                 for(uint32_t b=0;b<sbsps->count;b++) {
@@ -411,7 +411,7 @@ ProtonCacheFile ProtonMap::ToCacheFile() const {
     uint32_t tagDataAddress = tagNameAddress + tagNameLength;
     uint32_t tagDataOffset = 0;
     for(uint32_t i=0;i<metaHeader.tagCount;i++) {
-        ProtonTag *tag = map.tags.at(i).get();
+        ProtonTag *tag = map.tags[i].get();
         tagArray[i].not_in_map = tag->resource_index == NO_RESOURCE_INDEX ? 0 : 1;
         if(tagArray[i].not_in_map) {
             tagArray[i].data_offset = tag->resource_index;
@@ -500,7 +500,7 @@ ProtonMap& ProtonMap::operator=(const ProtonMap &map) {
     
     for(std::vector<int>::size_type i=0;i<map.tags.size();i++) {
         std::unique_ptr<ProtonTag> tag(new ProtonTag);
-        *(tag.get()) = *(map.tags.at(i).get());
+        *(tag.get()) = *(map.tags[i].get());
         this->tags.push_back(std::move(tag));
     }
     
