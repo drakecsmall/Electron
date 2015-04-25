@@ -13,10 +13,10 @@
 
 #define NULLED_TAG_ID 0xFFFF
 
-#define HEADER_HEAD *(uint32_t *)"head"
-#define HEADER_FOOT *(uint32_t *)"foot"
-#define HEADER_EHED *(uint32_t *)"Ehed"
-#define HEADER_GFOT *(uint32_t *)"Gfot"
+#define HEADER_HEAD 1751474532 // *(uint32_t *)"daeh"
+#define HEADER_FOOT 1718579060 // *(uint32_t *)"toof"
+#define HEADER_EHED 1164469604 // *(uint32_t *)"dehE"
+#define HEADER_GFOT 1197895540 // *(uint32_t *)"tofG"
 
 typedef enum HaloMapGame : uint32_t {
     HALO_MAP_GAME_PC = 7,
