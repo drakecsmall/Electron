@@ -6,9 +6,12 @@
 //  Copyright (c) 2015 Paul Whitcomb. All rights reserved.
 //
 
+#include <stdexcept>
+
 #include "ProtonMap.h"
 #include "BitmSndMap.h"
 
+// This function takes a cache file and breaks it apart.
 ProtonMap::ProtonMap(const void *cache_file) {
     const char *cache_file_c = (const char *)(cache_file);
     HaloCacheFileHeader header = *(HaloCacheFileHeader *)(cache_file_c);
@@ -18,6 +21,9 @@ ProtonMap::ProtonMap(const void *cache_file) {
         if(demoHeader.head == HEADER_EHED) {
             this->meta_address = 0x4BF10000;
             header = demoHeader.asStandardHeader();
+        }
+        else {
+            throw std::invalid_argument("not a valid map file");
         }
     }
     this->SetName(header.mapName);
