@@ -487,7 +487,7 @@ ProtonCacheFile ProtonMap::ToCacheFile() const {
     
     
     
-    ProtonCacheFile cacheFile(finalData,final_size);
+    ProtonCacheFile cacheFile(std::move(finalDataPtr),final_size);
     return cacheFile;
 }
 

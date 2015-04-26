@@ -15,33 +15,29 @@
 
 
 // This function initializes an indexed tag. Only Halo CE has these kinds of tags. The variable resource_index is the index for a tag in bitmaps.map, sounds.map, or loc.map, depending on class.
-ProtonTag::ProtonTag(const char *name, const char tag_classes[12], uint32_t resource_index) {
+ProtonTag::ProtonTag(const char *name, const char tag_classes[12], uint32_t resource_index)
+: resource_index(resource_index){
     
     this->SetName(name);
     
     memcpy(this->tag_classes,tag_classes,sizeof(this->tag_classes));
-    
-    this->resource_index = resource_index;
 }
 
 
 // This function creates a tag from existing tag data. If you aren't going to specify resource data, make sure resources_data_length is 0.
-ProtonTag::ProtonTag(const char *name, const char tag_classes[12], const char *tag_data, uint32_t tag_data_length, uint32_t tag_magic, const char *resources_data, uint32_t resources_data_length, ProtonTagArray *parent_tag_array) {
+ProtonTag::ProtonTag(const char *name, const char tag_classes[12], const char *tag_data, uint32_t tag_data_length, uint32_t tag_magic, const char *resources_data, uint32_t resources_data_length, ProtonTagArray *parent_tag_array)
+: resource_index(NO_RESOURCE_INDEX), tag_magic(tag_magic), tag_data_length(tag_data_length), resources_data_length(resources_data_length) {
     
     this->SetName(name);
     
     memcpy(this->tag_classes,tag_classes,sizeof(this->tag_classes));
-    this->resource_index = NO_RESOURCE_INDEX;
     
     if(resources_data_length > 0) {
-        this->resources_data_length = resources_data_length;
         this->resources_data = std::unique_ptr<char []>(new char[this->resources_data_length]);
         memcpy(this->resources_data.get(),resources_data,this->resources_data_length);
     }
     
     if(tag_data_length > 0) {
-        this->tag_magic = tag_magic;
-        this->tag_data_length = tag_data_length;
         this->tag_data = std::unique_ptr<char []>(new char[this->tag_data_length]);
         memcpy(this->tag_data.get(),tag_data,this->tag_data_length);
         this->ScanDependencies(parent_tag_array);
@@ -309,7 +305,7 @@ void ProtonTag::DeleteData(uint32_t offset, uint32_t size) {
         }
     }
     
-    this->OffsetData(offset, -size);
+    this->OffsetData(offset, -(int32_t)size);
     
     uint32_t new_size = this->DataLength() - size;
     
