@@ -17,6 +17,7 @@
 #define HEADER_FOOT 1718579060 // foot
 #define HEADER_EHED 1164469604 // Ehed
 #define HEADER_GFOT 1197895540 // Gfot
+#define INDEX_TAGS 1952540531 // tags
 
 typedef enum HaloMapGame : uint32_t {
     HALO_MAP_GAME_PC = 7,
@@ -104,7 +105,7 @@ struct HaloCacheFileTagDataHeader {
     uint32_t partCountB;
     uint32_t vertexSize;
     uint32_t modelSize;
-    char tags[4] = {'s', 'g', 'a', 't'};
+    uint32_t tags = INDEX_TAGS;
 };
 
 struct HaloCacheFileTagArrayIndex {
